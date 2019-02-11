@@ -2,7 +2,7 @@
     "matchId":{
         "sesonId": 0,
         "queId": 420,
-        "participantIdentities":[
+        "participantIdentities":
             {
                 "playerId":{
                     "summonerName":"example",
@@ -39,7 +39,7 @@
                     
                 }
             }
-        ],
+        ,
         "teams":[
             {
                 "teamId": 100,
