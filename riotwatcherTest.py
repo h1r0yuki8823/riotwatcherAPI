@@ -4,7 +4,7 @@ import json
 import collections as cl
 import pprint
 
-watcher = RiotWatcher('')
+watcher = RiotWatcher('RGAPI-93afd4f7-ded4-45ff-8f8f-d2861e96a7a3')
 
 my_region = 'jp1'
 me = watcher.summoner.by_name(my_region, 'zer08823')
