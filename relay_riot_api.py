@@ -28,9 +28,8 @@ def test_get(id):
 
 @app.route('/get/games_info/<id>', methods=['GET'])
 def get_summonerInfo(id):
+    participantId_list  = []
     gameId_list = []
-    seasonId_list = []
-    queueId_list = []
     ys = cl.OrderedDict()
     #試合毎のplayerIDを作成（固定）
     match_playerId_list = ["playerId0","playerId1","playerId2","playerId3","playerId4","playerId5","playerId6","playerId7","playerId8","playerId9",]
@@ -44,11 +43,11 @@ def get_summonerInfo(id):
         matches = recent_match_list['matches']
         for i in range(20):
             gameId_list.append(matches[i]['gameId'])
-
+            participantId_list.append('participantId' + str(i))
         print(gameId_list)
         #返すjsonファイルを作成
         #for i in range(len(gameId_list)):
-        for i in range(1):
+        for i in range(20):
 
             match_data = watcher.match.by_id(default_region, gameId_list[i])
             #seasonId_list.append(match_data['seasonId'])
@@ -66,10 +65,10 @@ def get_summonerInfo(id):
             both_team_data = []
             
             #一つの試合の10プレイヤー分のデータを作る処理
-            for i in range(10):
-                participants_data = participants[i]
+            for j in range(10):
+                participants_data = participants[j]
                 player_info_dict = {}
-                player_info_dict['summonerName'] = participantIdentities[i]['player']['summonerName']
+                player_info_dict['summonerName'] = participantIdentities[j]['player']['summonerName']
                 player_info_dict["teamId"] = participants_data['teamId']
                 player_info_dict["campionId"] = participants_data['championId']
                 player_info_dict["spell1Id"] = participants_data['spell1Id']
@@ -99,8 +98,7 @@ def get_summonerInfo(id):
                 player_info_dict["totalMinionsKilled"] = participants_data['stats']['totalMinionsKilled']
 
                 
-                match_player_dict[match_playerId_list[i]] = player_info_dict
-            pprint.pprint(match_player_dict)
+                match_player_dict[match_playerId_list[j]] = player_info_dict
 
             #teamデータを作成
             team1_info_dict['teamId'] = match_data['teams'][0]['teamId']
@@ -123,13 +121,15 @@ def get_summonerInfo(id):
 
             both_team_data.append(team1_info_dict)
             both_team_data.append(team2_info_dict)
-            print(both_team_data)
+            
 
             data['seasonId'] = match_data['seasonId']
             data['queueId'] = match_data['queueId']
             data['paticipantIdentities'] = match_player_dict
             data['teams'] = both_team_data
-            ys[gameId_list[i]] = data
+            data['gameId'] = gameId_list[i]
+            print(str(i))
+            ys[i] = data
 
          
         #json形式でreturn
