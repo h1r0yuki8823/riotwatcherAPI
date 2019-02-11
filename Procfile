@@ -1,0 +1,1 @@
+web: gunicorn relay_riot_api:app --log-file=-
