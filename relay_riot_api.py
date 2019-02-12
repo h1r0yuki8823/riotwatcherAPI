@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify, make_response
 from riotwatcher import RiotWatcher, ApiError
+from flask_cors import CORS 
 import json
 import collections as cl 
 import pprint 
@@ -7,13 +8,16 @@ import settings
 import os 
 
 app = Flask(__name__)
+CORS(app)
 app.config['JSON_AS_ASCII'] = False #JSONの日本語文字化け対策
 
 API_KEY = settings.AP
-
-watcher = RiotWatcher(API_KEY)
+print(settings.AP)
+#watcher = RiotWatcher(API_KEY)
+watcher = RiotWatcher("RGAPI-0069da0b-745e-4dae-a94a-802cc2ab13b6)
 default_region = 'jp1'
 
+#テスト用
 @app.route('/get/test_info/<id>', methods=['GET'])
 def test_get(id):
     test_summonerId = id 
@@ -26,9 +30,18 @@ def test_get(id):
         
         return make_response(jsonify(test_info))
 
-
-@app.route('/get/games_info/<id>', methods=['GET'])
+#プレイヤー情報を取得
+@app.route('/get/user_info/<id>', methods=['GET'])
 def get_summonerInfo(id):
+    summonerId = id 
+    if request.method == 'GET':
+        summoner_info = watcher.summoner.by_name(default_region, summonerId)
+        return make_response(jsonify(summoner_info))
+
+
+#試合情報を取得
+@app.route('/get/games_info/<id>', methods=['GET'])
+def get_gamesInfo(id):
     participantId_list  = []
     gameId_list = []
     ys = cl.OrderedDict()
