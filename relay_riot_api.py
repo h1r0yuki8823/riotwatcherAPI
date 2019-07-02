@@ -4,18 +4,27 @@ from flask_cors import CORS
 import json
 import collections as cl 
 import pprint 
-import settings
+import api_key
 import os 
+
+#実行する FLASK_APP=relay_riot_api.py flask run
 
 app = Flask(__name__)
 CORS(app)
 app.config['JSON_AS_ASCII'] = False #JSONの日本語文字化け対策
 
-API_KEY = settings.AP
-print(settings.AP)
-#watcher = RiotWatcher(API_KEY)
-watcher = RiotWatcher("RGAPI-0069da0b-745e-4dae-a94a-802cc2ab13b6)
+API_KEY = api_key.RIOT_API_KEY
+
+watcher = RiotWatcher(API_KEY)
 default_region = 'jp1'
+
+champion_dict = {}
+with open('champion.json', encoding="utf-8") as f:
+    df = json.load(f)
+for i in df["data"]:
+    champion_dict[int(df["data"][i]["key"])] = [df["data"][i]["name"]]
+
+print(champion_dict)
 
 #テスト用
 @app.route('/get/test_info/<id>', methods=['GET'])
@@ -55,13 +64,13 @@ def get_gamesInfo(id):
         recent_match_list = watcher.match.matchlist_by_account(default_region, summoner_info['accountId'],begin_index=0, end_index=20)
         #print(recent_match_list)
         matches = recent_match_list['matches']
-        for i in range(20):
+        for i in range(10):
             gameId_list.append(matches[i]['gameId'])
             participantId_list.append('participantId' + str(i))
         print(gameId_list)
         #返すjsonファイルを作成
         #for i in range(len(gameId_list)):
-        for i in range(20):
+        for i in range(10):
 
             match_data = watcher.match.by_id(default_region, gameId_list[i])
             #seasonId_list.append(match_data['seasonId'])
@@ -84,7 +93,9 @@ def get_gamesInfo(id):
                 player_info_dict = {}
                 player_info_dict['summonerName'] = participantIdentities[j]['player']['summonerName']
                 player_info_dict["teamId"] = participants_data['teamId']
-                player_info_dict["campionId"] = participants_data['championId']
+                player_info_dict["championId"] = participants_data['championId']
+                player_info_dict["championName"] = champion_dict[participants_data['championId']]
+                print(champion_dict[participants_data['championId']])
                 player_info_dict["spell1Id"] = participants_data['spell1Id']
                 player_info_dict["spell2Id"] = participants_data['spell2Id']
                 player_info_dict["champLevel"] = participants_data['stats']['champLevel']
